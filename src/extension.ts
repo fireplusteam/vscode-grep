@@ -26,15 +26,15 @@ function getCwd() {
 }
 
 function showTerminal(cwd: string = ''): vscode.Terminal {
-  if (!customTerminal) {
-    customTerminal = findTerminal(TERMINAL_NAME);
+  customTerminal = findTerminal(TERMINAL_NAME);
+  if (customTerminal) {
+    customTerminal.dispose();
+    customTerminal = null;
   }
-  if (!customTerminal) {
-    customTerminal = vscode.window.createTerminal({
-      cwd: cwd,
-      name: TERMINAL_NAME
-    });
-  }
+  customTerminal = vscode.window.createTerminal({
+    cwd: cwd,
+    name: TERMINAL_NAME
+  });
   customTerminal.show();
   return customTerminal;
 }
