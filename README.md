@@ -14,9 +14,3 @@ A ripgrep and fzf extension for Visual Studio Code.
 ![Usage](images/usage001.gif)
 
 - use shortcut `Ctrl+G`
-
-## Release Notes
-
-### 0.0.1
-
-- initial
