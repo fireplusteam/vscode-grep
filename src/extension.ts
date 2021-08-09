@@ -62,6 +62,10 @@ export function activate(context: vscode.ExtensionContext) {
 
       // vscode.window.showInformationMessage(`Message==> ${query}`);
 
+      if (query === undefined) {
+        return;
+      }
+
       const { cwd, type } = getCwd();
       let targetFile = '';
       let term = null;
