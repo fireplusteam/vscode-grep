@@ -4,4 +4,4 @@ npm install # resolve dependencies
 npm run compile
 vsce package
 
-code vscode-grep-0.0.3.vsix
+code --install-extension vscode-grep-fixed-0.0.3.vsix
