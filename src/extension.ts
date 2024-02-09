@@ -25,15 +25,16 @@ function getCwd() {
   return { cwd: cwd, type: type };
 }
 
-function showTerminal(cwd: string = ''): vscode.Terminal {
-  customTerminal = findTerminal(TERMINAL_NAME);
+function showTerminal({ cwd = '', name = '' }): vscode.Terminal {
+  const terminalName = TERMINAL_NAME + ":" + name;
+  customTerminal = findTerminal(terminalName);
   if (customTerminal) {
     customTerminal.dispose();
     customTerminal = null;
   }
   customTerminal = vscode.window.createTerminal({
     cwd: cwd,
-    name: TERMINAL_NAME
+    name: terminalName
   });
   customTerminal.show();
   return customTerminal;
@@ -62,7 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
         prompt: 'Please input search word.'
       }) || "";
 
-      if (query === undefined) {
+      if (query === undefined || query === "") {
         return;
       }
       context.globalState.update("grep.query", query);
@@ -72,12 +73,12 @@ export function activate(context: vscode.ExtensionContext) {
       let term = null;
       if (type === 'file' && vscode.window.activeTextEditor) {
         targetFile = vscode.window.activeTextEditor.document.uri.fsPath;
-        term = showTerminal();
+        term = showTerminal({ name: query });
       } else {
-        term = showTerminal(cwd);
+        term = showTerminal({cwd: cwd, name: query});
       }
 
-      const command = `${getRgDirPath()}rg --line-number --color=always --colors "path:none" --colors "line:none" --colors "match:fg:0xAA,0xDA,0xFA" ${query} ${targetFile} | ${getFzfDirPath()}fzf -e --ansi --color=hl:#5FA392 --bind "ctrl-m:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)" --bind "enter:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)"`;
+      const command = `${getRgDirPath()}rg --line-number --color=always --colors "path:none" --colors "line:none" --colors "match:fg:0xAA,0xDA,0xFA" ${query} ${targetFile} | ${getFzfDirPath()}fzf -i -e --ansi --color=hl:#5FA392 --bind "ctrl-m:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)" --bind "enter:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)"`;
 
       term.sendText(command, true);
     })
