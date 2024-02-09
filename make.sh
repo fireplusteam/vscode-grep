@@ -1,6 +1,7 @@
 #!/bin/bash
 
+npm install # resolve dependencies
 npm run compile
 vsce package
 
-code vsc-extension-quickstart.6.7.vsix
+code vscode-grep-0.0.3.vsix
