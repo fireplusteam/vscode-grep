@@ -30,7 +30,7 @@
     "keybindings": [
       {
         "command": "vscode-grep.runGrep",
-        "key": "ctrl+g"
+        "key": "ctrl+shift+t"
       }
     ],
     "configuration": {

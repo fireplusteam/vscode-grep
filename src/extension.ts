@@ -56,15 +56,16 @@ function getFzfDirPath() {
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('vscode-grep.runGrep', async () => {
-      const query = await vscode.window.showInputBox({
+      let query = context.globalState.get<string>("grep.query");
+      query = await vscode.window.showInputBox({
+        value: query,
         prompt: 'Please input search word.'
-      });
-
-      // vscode.window.showInformationMessage(`Message==> ${query}`);
+      }) || "";
 
       if (query === undefined) {
         return;
       }
+      context.globalState.update("grep.query", query);
 
       const { cwd, type } = getCwd();
       let targetFile = '';
