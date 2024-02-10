@@ -1,0 +1,2 @@
+#!/bin/bash
+rg --line-number --color=always --colors "path:none" --colors "line:none" --colors "match:fg:0xAA,0xDA,0xFA" -uu --files  | fzf -i -e --ansi --color=hl:#5FA392 --bind "ctrl-m:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)" --bind "enter:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)"

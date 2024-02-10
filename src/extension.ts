@@ -1,6 +1,8 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import * as path from 'path';
+import * as fs from 'fs';
 const TERMINAL_NAME = 'grep terminal';
 let customTerminal: vscode.Terminal | null = null;
 
@@ -70,7 +72,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       const { cwd, type } = getCwd();
       let targetFile = '';
-      let term = null;
+      let term: vscode.Terminal | null = null;
       if (type === 'file' && vscode.window.activeTextEditor) {
         targetFile = vscode.window.activeTextEditor.document.uri.fsPath;
         term = showTerminal({ name: query });
@@ -78,9 +80,15 @@ export function activate(context: vscode.ExtensionContext) {
         term = showTerminal({cwd: cwd, name: query});
       }
 
-      const command = `${getRgDirPath()}rg --line-number --color=always --colors "path:none" --colors "line:none" --colors "match:fg:0xAA,0xDA,0xFA" ${query} ${targetFile} | ${getFzfDirPath()}fzf -i -e --ansi --color=hl:#5FA392 --bind "ctrl-m:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)" --bind "enter:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)"`;
-
-      term.sendText(command, true);
+      const command = `#!/bin/bash\n${getRgDirPath()}rg --line-number --color=always --colors "path:none" --colors "line:none" --colors "match:fg:0xAA,0xDA,0xFA" ${query} ${targetFile} | ${getFzfDirPath()}fzf -i -e --ansi --color=hl:#5FA392 --bind "ctrl-m:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)" --bind "enter:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)"`;
+      const scriptPath = path.join(__dirname, '..', 'src', 'grep.sh');
+      fs.writeFile(scriptPath, command, "utf-8", function (err) {
+        if (err) {
+          console.log(`file is not updated: ${scriptPath}`);
+        } else {
+          term?.sendText(scriptPath, true);
+        }
+      });
     })
   );
 
