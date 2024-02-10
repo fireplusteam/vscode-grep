@@ -105,16 +105,20 @@ export function activate(context: vscode.ExtensionContext) {
 
       const query64 = `${Buffer.from(query + cwd, 'utf-8').toString('base64')}`;
 
-      let command = fs.readFileSync(path.join(__dirname, '..', 'src', 'grep.template.sh')).toString()
+      let command = fs.readFileSync(path.join(__dirname, '..', 'resources', 'grep.template.sh')).toString()
       command = command.split('${QUERY}').join(query64);
       command = command.replace('${FZF_OPTIONS}', fzfOptions);
       command = command.replace('${RG_OPTIONS}', rgOptions);
 
-      const scriptPath = path.join(__dirname, '..', 'src', `grep${query64}.sh`);
-      fs.writeFileSync(scriptPath, command, "utf-8");
+      const scriptPath = path.join('tmp', 'vs-grep', );
+      if (!fs.existsSync(scriptPath)){
+        fs.mkdirSync(scriptPath, { recursive: true }); // The `recursive` option ensures parent directories are also created if they don't exist
+      }
+      const script = path.join(scriptPath, `grep${query64}.sh`);
+      fs.writeFileSync(script, command, "utf-8");
 
-      term?.sendText(`chmod +x ${scriptPath}`);
-      term?.sendText(scriptPath, true);
+      term?.sendText(`chmod +x /${script}`);
+      term?.sendText("/" + script, true);
     })
   );
 

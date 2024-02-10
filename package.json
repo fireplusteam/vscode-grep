@@ -20,7 +20,6 @@
     "onCommand:vscode-grep.runGrep"
   ],
   "main": "./out/extension.js",
-  "files": ["src/grep.sh", "src/grep.template.sh"],
   "contributes": {
     "commands": [
       {
