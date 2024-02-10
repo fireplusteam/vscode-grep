@@ -103,7 +103,13 @@ export function activate(context: vscode.ExtensionContext) {
         term = showTerminal({cwd: cwd, name: query});
       }
 
-      const command = `#!/bin/bash\n${getRgDirPath()}rg --line-number --color=always --colors "path:none" --colors "line:none" --colors "match:fg:0xAA,0xDA,0xFA" ${rgOptions} | ${getFzfDirPath()}fzf -i -e --ansi --color=hl:#5FA392 ${fzfOptions} --bind "ctrl-m:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)" --bind "enter:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)"`;
+      const command = `#!/bin/bash\n${getRgDirPath()} \
+        rg --line-number --column --color=always --colors "path:none" --colors "line:none" --colors "match:fg:0xAA,0xDA,0xFA" ${rgOptions} |\n \
+        ${getFzfDirPath()}fzf -i -e --ansi --color=hl:#5FA392 ${fzfOptions} --bind "ctrl-m:execute-silent(echo {} |\n \
+        cut -f -2 -d ':' |\n \
+        xargs code --goto)" --bind "enter:execute-silent(echo {} |\n \
+        cut -f -2 -d ':' |\n \
+        xargs code --goto)"`;
       const scriptPath = path.join(__dirname, '..', 'src', `grep${Buffer.from(query, 'utf-8').toString('base64')}.sh`);
       fs.writeFile(scriptPath, command, "utf-8", function (err) {
         if (err) {
