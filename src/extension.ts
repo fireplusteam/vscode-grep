@@ -75,6 +75,12 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('vscode-grep.runGrep', async () => {
       let query = context.globalState.get<string>("grep.query");
+      vscode.window.showInformationMessage('\
+        Search by Files: --uu --files | rg \'.swift\' | fzf -no-sort\n \
+        Search by Terms: --uu \'Term\' -g \'*.swift\' -g \'!Folder/**\'\n \
+        Filter Logs: --uu \'\' -g \'*app.log\' | fzf -no-sort'
+      );
+
       query = await vscode.window.showInputBox({
         value: query,
         prompt: 'Please input search word.'
@@ -98,11 +104,12 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       const command = `#!/bin/bash\n${getRgDirPath()}rg --line-number --color=always --colors "path:none" --colors "line:none" --colors "match:fg:0xAA,0xDA,0xFA" ${rgOptions} | ${getFzfDirPath()}fzf -i -e --ansi --color=hl:#5FA392 ${fzfOptions} --bind "ctrl-m:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)" --bind "enter:execute-silent(echo {} | cut -f -2 -d ':' | xargs code --goto)"`;
-      const scriptPath = path.join(__dirname, '..', 'src', 'grep.sh');
+      const scriptPath = path.join(__dirname, '..', 'src', `grep${Buffer.from(query, 'utf-8').toString('base64')}.sh`);
       fs.writeFile(scriptPath, command, "utf-8", function (err) {
         if (err) {
           console.log(`file is not updated: ${scriptPath}`);
         } else {
+          term?.sendText(`chmod +x ${scriptPath}`);
           term?.sendText(scriptPath, true);
         }
       });
