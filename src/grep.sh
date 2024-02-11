@@ -1,9 +1,9 @@
 #!/bin/bash
 
-rm -f /tmp/rg-fzf-{r,f}
+#rm -f /tmp/rg-fzf-{r,f}
 
-RG_PREFIX="rg --column --line-number --no-heading --color=always  "
-
+#RG_PREFIX="rg --column --line-number --no-heading --color=always -i "
+RG_PREFIX="python3 resources/interactive_cmd.py "
 INITIAL_QUERY="${*:-}"
 
 # Switch between Ripgrep mode and fzf filtering mode (CTRL-T)
