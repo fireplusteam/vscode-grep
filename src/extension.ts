@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-const TERMINAL_NAME = 'g';
+const TERMINAL_NAME = 'grep';
 let customTerminal: vscode.Terminal | null = null;
 
 function findTerminal(name: string) {
@@ -56,34 +56,19 @@ function getFzfDirPath() {
   return fzfDirPath ? `${fzfDirPath}/` : '';
 }
 
-function extractFzfArguments(query: string) {
-  let regex = /\|\s*fzf/; // | fzf with any kind of white spaces
-  let match = query.match(regex);
-  if (match) {
-    let lastInd = query.indexOf("|", (match.index || 0) + 1);
-    if (lastInd === -1) {
-      lastInd = query.length;
-    }
-    const fzfOptions = query.substring(( match.index || 0 ) + match.toString().length, lastInd);
-    let rgOptions = query.substring(0, match.index) + query.substring(lastInd);
-    return [rgOptions, fzfOptions];
-  }
-  return [query, ""];
-}
-
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('vscode-grep.runGrep', async () => {
       let query = context.globalState.get<string>("grep.query");
       query = await vscode.window.showInputBox({
         value: query,
-        prompt: 'Please enter fzf args: fzf --no-sort'
+        prompt: 'Please enter fzf args: --no-sort'
       }) || "";
 
       if (query === undefined || query === "") {
         return;
       }
-      const [rgOptions, fzfOptions] = extractFzfArguments(query);
+      const fzfOptions = query;
       
       context.globalState.update("grep.query", query);
 
@@ -104,7 +89,6 @@ export function activate(context: vscode.ExtensionContext) {
       let command = fs.readFileSync(path.join(__dirname, '..', 'resources', 'grep.template.sh')).toString()
       command = command.split('${QUERY}').join(query64);
       command = command.replace('${FZF_OPTIONS}', fzfOptions);
-      command = command.replace('${RG_OPTIONS}', rgOptions);
       command = command.replace('${PYTHON_SCRIPT}', pythonScriptPath);
 
       const scriptPath = path.join('/tmp', 'vs-grep', );
