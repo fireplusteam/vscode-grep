@@ -17,6 +17,7 @@ INITIAL_QUERY="${*:-}"
     --prompt '1. ripgrep> ' \
     --delimiter : \
     --header 'CTRL-T: Switch between ripgrep/fzf' \
-    --preview 'bat --color=always {1} --highlight-line {2}' \
+    --preview 'if [[ -z {2} ]]; then; bat --color=always {1}; else; bat --color=always {1} --highlight-line {2}; fi' \
     --preview-window 'up,50%,border-bottom,+{2}+3/3,~3' \
+    --bind 'ctrl-/:change-preview-window(50%|hidden|)' \
     --bind 'enter:execute-silent(echo "{1}:{2}:{3}" | xargs code --goto)'
