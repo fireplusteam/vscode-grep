@@ -5,6 +5,7 @@ def print_help(query):
     print(f"Query: {query}")
     help = """Search Result is Empty: Fix it with Examples:
         --files -g '*.swift' => Display files applied with glob
+        -uu --files -g '**/ios/**/*.{swift,md}' -g '!**/.git/**' => complex glob request
         -g '*.swift' -g '!Folder/**' 'Some Regular Expression' => Regular Expression using glob
         '' => Feed with all content
     """
@@ -12,13 +13,19 @@ def print_help(query):
     
 try:
     query = sys.argv[1]
-    rg = f"rg --column --line-number --no-heading --color=always -i {query}"
+    rg = f"rg --column --line-number --no-heading --color=always --ignore-case {query}"
     if len(query) == 0:
         print_help(rg)
         exit(0)
-    process = subprocess.run(rg, shell=True, capture_output=True, text=True)
-    print(process.stdout)
-    if len(process.stdout) == 0:
+    process = subprocess.Popen(rg, shell=True, stdout=subprocess.PIPE, text=True)
+    is_ok = False 
+    while True:
+        str = process.stdout.readline()
+        if not str:
+            break
+        is_ok = True
+        print(str, end='')    
+    if not is_ok:
         print_help(rg)
 except Exception as e:
     print(str(e))

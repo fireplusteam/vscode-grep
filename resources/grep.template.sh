@@ -2,7 +2,8 @@
 
 rm -f /tmp/rg-${QUERY}fzf-{r,f}
 
-RG_PREFIX="rg --column --line-number --no-heading --color=always --ignore-case ${RG_OPTIONS} "
+#RG_PREFIX="rg --column --line-number --no-heading --color=always --ignore-case ${RG_OPTIONS} "
+RG_PREFIX="python3 ${PYTHON_SCRIPT} "
 
 INITIAL_QUERY="${*:-}"
 

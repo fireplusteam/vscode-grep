@@ -75,15 +75,9 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('vscode-grep.runGrep', async () => {
       let query = context.globalState.get<string>("grep.query");
-      vscode.window.showInformationMessage('\
-        Search by Terms: --uu -g \'*.swift\' -g \'!Folder/**\';;; \
-        Filter Logs: --uu \'\' -g \'*app.log\' | fzf -no-sort ;;; \
-        type --files in rg cmd line'
-      );
-
       query = await vscode.window.showInputBox({
         value: query,
-        prompt: 'Please input search word.'
+        prompt: 'Please enter fzf args: fzf --no-sort'
       }) || "";
 
       if (query === undefined || query === "") {
@@ -105,20 +99,23 @@ export function activate(context: vscode.ExtensionContext) {
 
       const query64 = `${Buffer.from(query + cwd, 'utf-8').toString('base64')}`;
 
+      const pythonScriptPath = path.join(__dirname, '..', 'resources', 'interactive_cmd.py');
+
       let command = fs.readFileSync(path.join(__dirname, '..', 'resources', 'grep.template.sh')).toString()
       command = command.split('${QUERY}').join(query64);
       command = command.replace('${FZF_OPTIONS}', fzfOptions);
       command = command.replace('${RG_OPTIONS}', rgOptions);
+      command = command.replace('${PYTHON_SCRIPT}', pythonScriptPath);
 
-      const scriptPath = path.join('tmp', 'vs-grep', );
+      const scriptPath = path.join('/tmp', 'vs-grep', );
       if (!fs.existsSync(scriptPath)){
         fs.mkdirSync(scriptPath, { recursive: true }); // The `recursive` option ensures parent directories are also created if they don't exist
       }
       const script = path.join(scriptPath, `grep${query64}.sh`);
       fs.writeFileSync(script, command, "utf-8");
 
-      term?.sendText(`chmod +x /${script}`);
-      term?.sendText("/" + script, true);
+      term?.sendText(`chmod +x ${script}`);
+      term?.sendText(script, true);
     })
   );
 
