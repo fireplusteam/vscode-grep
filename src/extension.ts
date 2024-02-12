@@ -70,16 +70,33 @@ function getCommandByOption(option: string | undefined) {
   return res;
 }
 
+function getActiveEditorFilePath() {
+  let activeEditor = vscode.window.activeTextEditor;
+  if (activeEditor) {
+    let filePath = activeEditor.document.uri.fsPath;  // absolute file path
+    let workspaceRoot = vscode.workspace.rootPath || "";  // workspace root path
+    if (workspaceRoot) {
+      let relativePath = vscode.workspace.asRelativePath(filePath, false);
+      console.log(relativePath);  // path of file relative to workspace root
+      return relativePath; 
+    }
+  }
+  return "";
+}
+
 function getInputByOption(input: string, option: string | undefined) {
   if (option === "Files") {
     return "--files";
   }
   if (option === "Find Fzf Text") {
+    if (input.indexOf("--trim") == -1) {
+      return `--trim ${input}`;
+    }
     return input;
   }
   if (option == "Active File") {
     // otherwise active file is opened
-    return `-g "${vscode.window.activeTextEditor?.document.uri}" ''` || "";
+    return `-uuu --trim -g \'${getActiveEditorFilePath()}\' ''` || "";
   }
   return input; // by default
 }
