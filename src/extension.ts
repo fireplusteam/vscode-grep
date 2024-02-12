@@ -86,20 +86,34 @@ export function activate(context: vscode.ExtensionContext) {
 
       const pythonScriptPath = path.join(__dirname, '..', 'resources', 'interactive_cmd.py');
 
-      let command = fs.readFileSync(path.join(__dirname, '..', 'resources', 'grep.template.sh')).toString()
-      command = command.split('${QUERY}').join(query64);
-      command = command.replace('${FZF_OPTIONS}', fzfOptions);
-      command = command.replace('${PYTHON_SCRIPT}', pythonScriptPath);
-
       const scriptPath = path.join('/tmp', 'vs-grep', );
       if (!fs.existsSync(scriptPath)){
         fs.mkdirSync(scriptPath, { recursive: true }); // The `recursive` option ensures parent directories are also created if they don't exist
       }
+
+      const fileNameRg = path.join(scriptPath, `rg-${query64}-r`);
+      const fileNameFzf = path.join(scriptPath, `rg-${query64}-f`);
+
+      let command = fs.readFileSync(path.join(__dirname, '..', 'resources', 'grep.template.sh')).toString()
+      
+      command = command.split('${FILE_RG}').join(fileNameRg);
+      command = command.split('${FILE_FZF}').join(fileNameFzf);
+      command = command.replace('${FZF_OPTIONS}', fzfOptions);
+      command = command.replace('${PYTHON_SCRIPT}', pythonScriptPath);
+
       const script = path.join(scriptPath, `grep${query64}.sh`);
       fs.writeFileSync(script, command, "utf-8");
 
+      let input = "";
+      if (fs.existsSync(fileNameRg)) {
+        input = fs.readFileSync(fileNameRg).toString();
+        while (input.length > 0 && input[input.length - 1] === '\n') {
+          input = input.substring(0, input.length - 1);
+        }
+      }
+
       term?.sendText(`chmod +x ${script}`);
-      term?.sendText(script, true);
+      term?.sendText(script + " \"" + input + "\"", true);
     })
   );
 

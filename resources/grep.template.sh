@@ -1,7 +1,5 @@
 #!/bin/bash
 
-rm -f /tmp/rg-${QUERY}fzf-{r,f}
-
 #RG_PREFIX="rg --column --line-number --no-heading --color=always --ignore-case ${RG_OPTIONS} "
 RG_PREFIX="python3 ${PYTHON_SCRIPT} "
 
@@ -12,8 +10,8 @@ INITIAL_QUERY="${*:-}"
     --bind "start:reload:$RG_PREFIX {q}" \
     --bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
     --bind 'ctrl-t:transform:[[ ! $FZF_PROMPT =~ ripgrep ]] &&
-      echo "rebind(change)+change-prompt(1. ripgrep> )+disable-search+transform-query:echo \{q} > /tmp/rg-${QUERY}fzf-f; cat /tmp/rg-${QUERY}fzf-r" ||
-      echo "unbind(change)+change-prompt(2. fzf> )+enable-search+transform-query:echo \{q} > /tmp/rg-${QUERY}fzf-r; cat /tmp/rg-${QUERY}fzf-f"' \
+      echo "rebind(change)+change-prompt(1. ripgrep> )+disable-search+transform-query:echo \{q} > ${FILE_FZF}; cat ${FILE_RG}" ||
+      echo "unbind(change)+change-prompt(2. fzf> )+enable-search+transform-query:echo \{q} > ${FILE_RG}; cat ${FILE_FZF}"' \
     --color "hl:#0000FF:underline,hl+:#0000FF:underline:reverse" \
     --prompt '1. ripgrep> ' \
     --delimiter : \
