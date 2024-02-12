@@ -56,9 +56,35 @@ function getFzfDirPath() {
   return fzfDirPath ? `${fzfDirPath}/` : '';
 }
 
+function getRelativePath(filePath: string) {
+  let workspaceRoot = vscode.workspace.rootPath || "";  // workspace root path
+  if (workspaceRoot) {
+    let relativePath = vscode.workspace.asRelativePath(filePath, false);
+    console.log(relativePath);  // path of file relative to workspace root
+    return relativePath; 
+  }
+  return path;
+}
+
+function getActiveEditorFilePath() {
+  let activeEditor = vscode.window.activeTextEditor;
+  if (activeEditor) {
+    let filePath = getRelativePath(activeEditor.document.uri.fsPath);  // absolute file path
+    return filePath;
+  }
+  return "";
+}
+
+function getAllActiveEditorsPaths() {
+  const files = vscode.workspace.textDocuments.map(doc => {
+    return getRelativePath(doc.uri.fsPath);
+  });
+  return files;
+}
+
 function getCommandByOption(option: string | undefined) {
   let res = '';
-  if ( option === "Files" ) { 
+  if ( option === "Files" || option === "Open Files" ) { 
     res = "grep.files.template.sh";
   }
   if (option === "Find Fzf Text") {
@@ -70,23 +96,12 @@ function getCommandByOption(option: string | undefined) {
   return res;
 }
 
-function getActiveEditorFilePath() {
-  let activeEditor = vscode.window.activeTextEditor;
-  if (activeEditor) {
-    let filePath = activeEditor.document.uri.fsPath;  // absolute file path
-    let workspaceRoot = vscode.workspace.rootPath || "";  // workspace root path
-    if (workspaceRoot) {
-      let relativePath = vscode.workspace.asRelativePath(filePath, false);
-      console.log(relativePath);  // path of file relative to workspace root
-      return relativePath; 
-    }
-  }
-  return "";
-}
-
 function getInputByOption(input: string, option: string | undefined) {
   if (option === "Files") {
     return "--files";
+  }
+  if (option === "Open Files") {
+    return `-uuu --files -g '{${getAllActiveEditorsPaths().join(",")}}'`;
   }
   if (option === "Find Fzf Text") {
     if (input.indexOf("--trim") == -1) {
@@ -104,7 +119,7 @@ function getInputByOption(input: string, option: string | undefined) {
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('vscode-grep.runGrep', async () => {
-      let option = await vscode.window.showQuickPick(["Files", "Find Fzf Text", "Active File", "Custom"]);
+      let option = await vscode.window.showQuickPick(["Files", "Open Files", "Find Fzf Text", "Active File", "Custom"]);
       
       let query = context.globalState.get<string>(`grep.query.${option}`) || "";
       if (option === "Custom") {
