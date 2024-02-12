@@ -56,21 +56,56 @@ function getFzfDirPath() {
   return fzfDirPath ? `${fzfDirPath}/` : '';
 }
 
+function getCommandByOption(option: string | undefined) {
+  let res = '';
+  if ( option === "Files" ) { 
+    res = "grep.files.template.sh";
+  }
+  if (option === "Find Fzf Text") {
+    res = 'grep.template.sh';
+  }
+  if (option == "Active File") {
+    res = "grep.files.template.sh";
+  }
+  return res;
+}
+
+function getInputByOption(input: string, option: string | undefined) {
+  if (option === "Files") {
+    return "--files";
+  }
+  if (option === "Find Fzf Text") {
+    return input;
+  }
+  if (option == "Active File") {
+    // otherwise active file is opened
+    return `-g "${vscode.window.activeTextEditor?.document.uri}" ''` || "";
+  }
+  return input; // by default
+}
+
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('vscode-grep.runGrep', async () => {
-      let query = context.globalState.get<string>("grep.query");
-      query = await vscode.window.showInputBox({
-        value: query,
-        prompt: 'Please enter fzf args: --no-sort'
-      }) || "";
+      let option = await vscode.window.showQuickPick(["Files", "Find Fzf Text", "Active File", "Custom"]);
+      
+      let query = context.globalState.get<string>(`grep.query.${option}`) || "";
+      if (option === "Custom") {
+        query = await vscode.window.showInputBox({
+          value: query,
+          prompt: 'Please enter fzf args: --no-sort'
+        }) || "";
+      } else {
+        query = "";
+      }
 
       if (query === undefined) {
         return;
       }
       const fzfOptions = query;
       
-      context.globalState.update("grep.query", query);
+      context.globalState.update(`grep.query.${option}`, query);
+      query = `${option}:${query}`
 
       const { cwd, type } = getCwd();
       //let targetFile = '';
@@ -94,7 +129,7 @@ export function activate(context: vscode.ExtensionContext) {
       const fileNameRg = path.join(scriptPath, `rg-${query64}-r`);
       const fileNameFzf = path.join(scriptPath, `rg-${query64}-f`);
 
-      let command = fs.readFileSync(path.join(__dirname, '..', 'resources', 'grep.template.sh')).toString()
+      let command = fs.readFileSync(path.join(__dirname, '..', 'resources', getCommandByOption(option))).toString()
       
       command = command.split('${FILE_RG}').join(fileNameRg);
       command = command.split('${FILE_FZF}').join(fileNameFzf);
@@ -111,6 +146,7 @@ export function activate(context: vscode.ExtensionContext) {
           input = input.substring(0, input.length - 1);
         }
       }
+      input = getInputByOption(input, option);
 
       term?.sendText(`chmod +x ${script}`);
       term?.sendText(script + " \"" + input + "\"", true);
