@@ -65,7 +65,7 @@ export function activate(context: vscode.ExtensionContext) {
         prompt: 'Please enter fzf args: --no-sort'
       }) || "";
 
-      if (query === undefined || query === "") {
+      if (query === undefined) {
         return;
       }
       const fzfOptions = query;
