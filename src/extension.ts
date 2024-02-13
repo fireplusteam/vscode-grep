@@ -166,7 +166,7 @@ export function activate(context: vscode.ExtensionContext) {
       command = command.split('${FILE_RG}').join(fileNameRg);
       command = command.split('${FILE_FZF}').join(fileNameFzf);
       command = command.replace('${FZF_OPTIONS}', fzfOptions);
-      command = command.replace('${PYTHON_SCRIPT}', pythonScriptPath);
+      command = command.split('${PYTHON_SCRIPT}').join(pythonScriptPath);
       if (option === "Active File") {
         command = command.split('${PREVIEW_FILE}').join(getActiveEditorFilePath().toString());
       }

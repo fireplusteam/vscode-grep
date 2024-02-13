@@ -12,8 +12,18 @@ def print_help(query):
     print(help)
     
 try:
-    query = sys.argv[1]
-    #print(f"QUIERY: {query}")
+    if sys.argv[1].startswith('-fileRELOADING_OPTION'):
+        try:
+            file_name = sys.argv[1].removeprefix("-fileRELOADING_OPTION ").rstrip("\"")
+            with open(file_name, 'r+') as file:
+                query = file.readline().rstrip("\n")
+        except Exception as e:
+            print(f"EXCEPTION while reloading with CTRL+R {str(e)}")
+    else:
+        # query
+        query = sys.argv[1]
+        
+    print(f"QUIERY: {query}")
     rg = f"rg --column --line-number --no-heading --color=always --ignore-case {query}"
     if len(query) == 0:
         print_help(rg)
