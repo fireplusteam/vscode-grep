@@ -16,7 +16,7 @@ INITIAL_QUERY="${*:-}"
     --color "hl:#0000FF:underline,hl+:#0000FF:underline:reverse" \
     --prompt '1. ripgrep> ' \
     --delimiter : \
-    --header 'CTRL-T: Switch between ripgrep/fzf | CTRL-R to refresh the list | CTRL-/ to show/hidde preview' \
+    --header 'CTRL-T: Switch between ripgrep/fzf | CTRL-R to refresh the list | CTRL-/ to show/hide preview' \
     --preview "bat --color=always \"${PREVIEW_FILE}\" --highlight-line {1}" \
     --preview-window 'up:50%:wrap:border-bottom:+{1}+3/3:~3' \
     --bind 'ctrl-/:change-preview-window(50%|hidden|)' \
