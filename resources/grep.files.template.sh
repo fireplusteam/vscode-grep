@@ -5,6 +5,8 @@ RG_PREFIX="python3 ${PYTHON_SCRIPT} "
 
 INITIAL_QUERY="${*:-}"
 
+echo "$INITIAL_QUERY" > "${FILE_FZF}"
+
 # Switch between Ripgrep mode and fzf filtering mode (CTRL-T)
 : | fzf -i --ansi --disabled ${FZF_OPTIONS} --query "$INITIAL_QUERY" \
     --bind "start:reload($RG_PREFIX {q})+transform:echo \"unbind(change)+change-prompt(2. fzf> )+enable-search+transform-query:echo \{q} > ${FILE_RG}; cat ${FILE_FZF}\"" \
