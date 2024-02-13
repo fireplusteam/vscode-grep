@@ -1,5 +1,8 @@
+import fcntl
 import sys
 import subprocess
+import os
+import time
 
 def print_help(query):
     print(f"Query: {query}")
@@ -28,15 +31,27 @@ try:
     if len(query) == 0:
         print_help(rg)
         exit(0)
-    process = subprocess.Popen(rg, shell=True, stdout=subprocess.PIPE, text=True)
+    process = subprocess.Popen(rg, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    # Set output to non-blocking
+    flags = fcntl.fcntl(process.stdout, fcntl.F_GETFL) # first get current process.stdout flags
+    fcntl.fcntl(process.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+
     is_ok = False 
+    #print(process.stdout)
     while True:
-        str = process.stdout.readline()
-        if not str:
+        try:
+            output = process.stdout.buffer.read()
+        except OSError:
+            time.sleep(0.05) # wait a short period of time then try again
+            continue
+        
+        if output == b'' and process.poll() is not None:
             break
-        is_ok = True
-        print(str, end='')    
+        if output:
+            is_ok = True
+            sys.stdout.buffer.write(output)
+            
     if not is_ok:
         print_help(rg)
 except Exception as e:
-    print(str(e))
+    print("EXCEPTION_OF_RUNNING: " + str(e))
