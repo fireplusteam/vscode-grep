@@ -87,7 +87,7 @@ function getCommandByOption(option: string | undefined) {
   if ( option === "Files" || option === "Open Files" ) { 
     res = "grep.files.template.sh";
   }
-  if (option === "Find Fzf Text") {
+  if (option === "Find Fzf Text" || option == 'Custom') {
     res = 'grep.template.sh';
   }
   if (option === "Active File") {
