@@ -9,7 +9,7 @@ RELOAD="$RG_PREFIX \"-fileRELOADING_OPTION ${FILE_RG}\""
 
 # Switch between Ripgrep mode and fzf filtering mode (CTRL-T)
 : | fzf -i --ansi --disabled ${FZF_OPTIONS} --query "$INITIAL_QUERY" \
-    --bind "start:reload($RG_PREFIX {q})+transform:echo \"unbind(change)+change-prompt(2. fzf> )+enable-search+transform-query:echo \{q} > ${FILE_RG}; cat ${FILE_FZF}\"" \
+    --bind "start:reload($RG_PREFIX {q})+transform(python3 '${PYTHON_TRANSFORM_SCRIPT}' {q} ${FILE_RG} ${FILE_FZF})" \
     --bind "change:execute-silent(python3 '${PYTHON_DUMP_SCRIPT}' {q} ${FILE_RG} ${FILE_FZF})+reload:sleep 0.1; $RG_PREFIX {q} || true" \
     --bind "ctrl-r:reload:$RELOAD" \
     --bind "ctrl-t:transform(python3 '${PYTHON_TRANSFORM_SCRIPT}' {q} ${FILE_RG} ${FILE_FZF})" \
