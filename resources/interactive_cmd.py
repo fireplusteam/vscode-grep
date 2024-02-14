@@ -25,6 +25,10 @@ try:
     else:
         # query
         query = sys.argv[1]
+    
+    if '--files' in query:
+        awk = "awk -F/ '{ filename=$NF; path=\"\"; for(i=1; i<NF; i++) path=path $i FS; print filename \" ~~> \" path }'"; 
+        query = f"{query} | {awk}"
         
     #print(f"QUIERY: {query}")
     rg = f"rg --column --line-number --no-heading --color=always --ignore-case {query}"

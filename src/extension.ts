@@ -101,12 +101,14 @@ function getCommandByOption(option: string | undefined) {
 
 function getInputByOption(input: string, option: string | undefined) {
   // awk to print file path in format: filename ~> /path/
-  const awk = `awk -F/ '{ filename=$NF; path=""; for(i=1; i<NF; i++) path=path $i FS; print filename " ~~> " path }'`; 
   if (option === "Files") {
-    return `--files | ${awk}`;
+    if (input.indexOf("--files") === -1) {
+      input = `--files ${input}`;
+    }
+    return input;
   }
   if (option === "Buffers Files") {
-    return `-uuu --files -g '{${getAllActiveEditorsPaths().join(",")}}' | ${awk}`;
+    return `-uuu --files -g '{${getAllActiveEditorsPaths().join(",")}}'`;
   }
   if (option === "Content Search") {
     return input;
