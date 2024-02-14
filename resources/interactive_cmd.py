@@ -26,7 +26,7 @@ try:
         # query
         query = sys.argv[1]
         
-    print(f"QUIERY: {query}")
+    #print(f"QUIERY: {query}")
     rg = f"rg --column --line-number --no-heading --color=always --ignore-case {query}"
     if len(query) == 0:
         print_help(rg)

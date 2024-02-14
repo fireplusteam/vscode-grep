@@ -144,16 +144,14 @@ export function activate(context: vscode.ExtensionContext) {
       if (query === undefined || option === undefined) {
         return;
       }
-      const fzfOptions = getFzfOptions(query, option);
-      
       context.globalState.update(`grep.query.${option}`, query);
+      
+      const fzfOptions = getFzfOptions(query, option);
       query = `${option}:${query}`;
 
       const { cwd, type } = getCwd();
-      //let targetFile = '';
       let term: vscode.Terminal | null = null;
       if (type === 'file' && vscode.window.activeTextEditor) {
-        //targetFile = vscode.window.activeTextEditor.document.uri.fsPath;
         term = showTerminal({ name: query });
       } else {
         term = showTerminal({cwd: cwd, name: query});
