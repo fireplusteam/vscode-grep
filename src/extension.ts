@@ -84,14 +84,17 @@ function getAllActiveEditorsPaths() {
 
 function getCommandByOption(option: string | undefined) {
   let res = '';
-  if ( option === "Files" || option === "Open Files" ) { 
+  if ( option === "Files" || option === "Buffers Files" ) { 
     res = "grep.files.template.sh";
   }
-  if (option === "Find Fzf Text" || option == 'Custom') {
+  if (option === "Content Search" || option === 'Custom') {
     res = 'grep.template.sh';
   }
-  if (option === "Active File") {
+  if (option === "Content Search: Active File") {
     res = "grep.active.file.template.sh";
+  }
+  if (option === "Content Search: Buffers") {
+    res = "grep.files.template.sh";
   }
   return res;
 }
@@ -100,26 +103,33 @@ function getInputByOption(input: string, option: string | undefined) {
   if (option === "Files") {
     return "--files";
   }
-  if (option === "Open Files") {
+  if (option === "Buffers Files") {
     return `-uuu --files -g '{${getAllActiveEditorsPaths().join(",")}}'`;
   }
-  if (option === "Find Fzf Text") {
-    if (input.indexOf("--trim") === -1) {
-      return `--trim ${input}`;
-    }
+  if (option === "Content Search") {
     return input;
   }
-  if (option === "Active File") {
+  if (option === "Content Search: Active File") {
     // otherwise active file is opened
     return `-uuu --heading -g \'${getActiveEditorFilePath()}\' ''` || "";
   }
+  if (option === "Content Search: Buffers") {
+    return `-uuu -g '{${getAllActiveEditorsPaths().join(",")} ''}' ''`;
+  }
   return input; // by default
+}
+
+function getFzfOptions(query: string, option: string | undefined) {
+  if (option === "Content Search" || option === "Content Search: Buffers") {
+    return '--nth 4..1999';
+  }
+  return query;
 }
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('vscode-grep.runGrep', async () => {
-      let option = await vscode.window.showQuickPick(["Files", "Open Files", "Find Fzf Text", "Active File", "Custom"]);
+      let option = await vscode.window.showQuickPick(["Files", "Buffers Files", "Content Search", "Content Search: Buffers", "Content Search: Active File", "Custom"]);
       
       let query = context.globalState.get<string>(`grep.query.${option}`) || "";
       if (option === "Custom") {
@@ -131,10 +141,10 @@ export function activate(context: vscode.ExtensionContext) {
         query = "";
       }
 
-      if (query === undefined) {
+      if (query === undefined || option === undefined) {
         return;
       }
-      const fzfOptions = query;
+      const fzfOptions = getFzfOptions(query, option);
       
       context.globalState.update(`grep.query.${option}`, query);
       query = `${option}:${query}`;
@@ -167,7 +177,7 @@ export function activate(context: vscode.ExtensionContext) {
       command = command.split('${FILE_FZF}').join(fileNameFzf);
       command = command.replace('${FZF_OPTIONS}', fzfOptions);
       command = command.split('${PYTHON_SCRIPT}').join(pythonScriptPath);
-      if (option === "Active File") {
+      if (option === "Content Search: Active File") {
         command = command.split('${PREVIEW_FILE}').join(getActiveEditorFilePath().toString());
       }
 

@@ -52,6 +52,8 @@ try:
             sys.stdout.buffer.write(output)
             
     if not is_ok:
+        print("Error: " + process.stderr.read())
         print_help(rg)
+        
 except Exception as e:
     print("EXCEPTION_OF_RUNNING: " + str(e))
