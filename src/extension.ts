@@ -164,6 +164,8 @@ export function activate(context: vscode.ExtensionContext) {
       const query64 = `${Buffer.from(query + cwd, 'utf-8').toString('base64')}`;
 
       const pythonScriptPath = path.join(__dirname, '..', 'resources', 'interactive_cmd.py');
+      const pythonTransformScriptPath = path.join(__dirname, '..', 'resources', 'transform.py');
+      const pythonDumpScriptPath = path.join(__dirname, '..', 'resources', 'dump_q.py');
 
       const scriptPath = path.join('/tmp', 'vs-grep', );
       if (!fs.existsSync(scriptPath)){
@@ -179,6 +181,8 @@ export function activate(context: vscode.ExtensionContext) {
       command = command.split('${FILE_FZF}').join(fileNameFzf);
       command = command.replace('${FZF_OPTIONS}', fzfOptions);
       command = command.split('${PYTHON_SCRIPT}').join(pythonScriptPath);
+      command = command.split('${PYTHON_TRANSFORM_SCRIPT}').join(pythonTransformScriptPath);
+      command = command.split('${PYTHON_DUMP_SCRIPT}').join(pythonDumpScriptPath);
       if (option === "Content Search: Active File") {
         command = command.split('${PREVIEW_FILE}').join(getActiveEditorFilePath().toString());
       }
