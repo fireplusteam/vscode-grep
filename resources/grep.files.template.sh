@@ -22,7 +22,7 @@ chmod +x "${FILE_RG}.sh"
     --prompt '1. ripgrep> ' \
     --delimiter ' ~~> ' \
     --header 'CTRL-T: Switch between ripgrep/fzf | CTRL-R to refresh the list | CTRL-/ to show/hide preview' \
-    --preview 'if [[ -z {2} ]]; then; bat --color=always {1}; else; bat --color=always {1} --highlight-line {2}; fi' \
+    --preview 'bat --color=always {2}{1}' \
     --preview-window 'up:50%:wrap:border-bottom:+{2}+3/3:~3' \
     --bind 'ctrl-/:change-preview-window(50%|hidden|)' \
     --bind 'enter:execute-silent(echo "{2}{1}" | xargs code --goto)'
