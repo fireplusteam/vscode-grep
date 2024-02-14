@@ -8,11 +8,9 @@ INITIAL_QUERY="${*:-}"
 
 # Switch between Ripgrep mode and fzf filtering mode (CTRL-T)
 : | fzf -i --ansi --disabled --query "$INITIAL_QUERY" \
-    --bind "start:reload:$RG_PREFIX {q}" \
+    --bind "start:reload($RG_PREFIX {q})+transform:python3 resources/transform.py {q} /tmp/rg-fzf-r /tmp/rg-fzf-f" \
     --bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
-    --bind 'ctrl-t:transform:[[ ! $FZF_PROMPT =~ ripgrep ]] &&
-      echo "rebind(change)+change-prompt(1. ripgrep> )+disable-search+transform-query:echo \{q} > /tmp/rg-fzf-f; cat /tmp/rg-fzf-r" ||
-      echo "unbind(change)+change-prompt(2. fzf> )+enable-search+transform-query:echo \{q} > /tmp/rg-fzf-r; cat /tmp/rg-fzf-f"' \
+    --bind "ctrl-t:transform(python3 resources/transform.py {q} /tmp/rg-fzf-r /tmp/rg-fzf-f)" \
     --color "hl:#0000FF:underline,hl+:#0000FF:underline:reverse" \
     --prompt '1. ripgrep> ' \
     --delimiter : \
