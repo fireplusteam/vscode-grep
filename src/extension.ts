@@ -94,17 +94,19 @@ function getCommandByOption(option: string | undefined) {
     res = "grep.active.file.template.sh";
   }
   if (option === "Content Search: Buffers") {
-    res = "grep.files.template.sh";
+    res = "grep.buffer.files.content.template.sh";
   }
   return res;
 }
 
 function getInputByOption(input: string, option: string | undefined) {
+  // awk to print file path in format: filename ~> /path/
+  const awk = `awk -F/ '{ filename=$NF; path=""; for(i=1; i<NF; i++) path=path $i FS; print filename " ~~> " path }'`; 
   if (option === "Files") {
-    return "--files";
+    return `--files | ${awk}`;
   }
   if (option === "Buffers Files") {
-    return `-uuu --files -g '{${getAllActiveEditorsPaths().join(",")}}'`;
+    return `-uuu --files -g '{${getAllActiveEditorsPaths().join(",")}}' | ${awk}`;
   }
   if (option === "Content Search") {
     return input;
@@ -192,7 +194,7 @@ export function activate(context: vscode.ExtensionContext) {
       input = getInputByOption(input, option);
 
       term?.sendText(`chmod +x ${script}`);
-      term?.sendText(script + " \"" + input + "\"", true);
+      term?.sendText(script + " \"" + Buffer.from(input, 'utf-8').toString('base64') + "\"", true);
     })
   );
 

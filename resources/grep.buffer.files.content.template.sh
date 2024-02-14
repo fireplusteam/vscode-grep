@@ -12,7 +12,7 @@ chmod +x "${FILE_RG}.sh"
 
 # Switch between Ripgrep mode and fzf filtering mode (CTRL-T)
 : | fzf -i --ansi --disabled ${FZF_OPTIONS} --query "$INITIAL_QUERY" \
-    --bind "start:reload:$RG_PREFIX {q}" \
+    --bind "start:reload($RG_PREFIX {q})+transform:echo \"unbind(change)+change-prompt(2. fzf> )+enable-search+transform-query:echo \{q} > ${FILE_RG}; cat ${FILE_FZF}\"" \
     --bind "change:execute-silent(${FILE_RG}.sh {q})+reload:sleep 0.1; $RG_PREFIX {q} || true" \
     --bind "ctrl-r:reload:$RELOAD" \
     --bind 'ctrl-t:transform:[[ ! $FZF_PROMPT =~ ripgrep ]] &&
@@ -21,7 +21,7 @@ chmod +x "${FILE_RG}.sh"
     --color "hl:#0000FF:underline,hl+:#0000FF:underline:reverse" \
     --prompt '1. ripgrep> ' \
     --delimiter : \
-    --header 'CTRL-T: Switch between ripgrep/fzf | CTRL-R to refresh the list | CTRL-/ to show/hidde preview' \
+    --header 'CTRL-T: Switch between ripgrep/fzf | CTRL-R to refresh the list | CTRL-/ to show/hide preview' \
     --preview 'if [[ -z {2} ]]; then; bat --color=always {1}; else; bat --color=always {1} --highlight-line {2}; fi' \
     --preview-window 'up:50%:wrap:border-bottom:+{2}+3/3:~3' \
     --bind 'ctrl-/:change-preview-window(50%|hidden|)' \

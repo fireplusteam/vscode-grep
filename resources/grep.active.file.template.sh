@@ -1,9 +1,8 @@
 #!/bin/bash
 
-#RG_PREFIX="rg --column --line-number --no-heading --color=always --ignore-case ${RG_OPTIONS} "
 RG_PREFIX="python3 ${PYTHON_SCRIPT} "
 
-INITIAL_QUERY="${*:-}"
+INITIAL_QUERY=$(echo -n "$1" | base64 -d)
 
 echo "$INITIAL_QUERY" > "${FILE_RG}"
 RELOAD="$RG_PREFIX \"-fileRELOADING_OPTION ${FILE_RG}\""
