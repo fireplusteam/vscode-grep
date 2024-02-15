@@ -31,13 +31,13 @@ function showTerminal({ cwd = '', name = '' }): vscode.Terminal {
   const terminalName = TERMINAL_NAME + ":" + name;
   customTerminal = findTerminal(terminalName);
   if (customTerminal) {
-    customTerminal.dispose();
-    customTerminal = null;
+    customTerminal.sendText("■"); // special character is used abort existing session of fzf and store data to files
+  } else {
+    customTerminal = vscode.window.createTerminal({
+      cwd: cwd,
+      name: terminalName
+    });
   }
-  customTerminal = vscode.window.createTerminal({
-    cwd: cwd,
-    name: terminalName
-  });
   customTerminal.show();
   return customTerminal;
 }

@@ -13,6 +13,10 @@ RELOAD="$RG_PREFIX \"-fileRELOADING_OPTION ${FILE_RG}\""
     --bind "change:execute-silent(python3 '${PYTHON_DUMP_SCRIPT}' {q} ${FILE_RG} ${FILE_FZF})+reload:sleep 0.1; $RG_PREFIX {q} || true" \
     --bind "ctrl-r:reload:$RELOAD" \
     --bind "ctrl-t:transform(python3 '${PYTHON_TRANSFORM_SCRIPT}' {q} ${FILE_RG} ${FILE_FZF})" \
+    --bind "ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-j:preview-down,ctrl-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up" \
+    --bind "■:execute-silent(python3 '${PYTHON_DUMP_SCRIPT}' {q} ${FILE_RG} ${FILE_FZF})+abort" \
+    --bind "esc:execute-silent(python3 '${PYTHON_DUMP_SCRIPT}' {q} ${FILE_RG} ${FILE_FZF})+abort" \
+    --bind=ctrl-s:toggle-sort \
     --color "hl:#0000FF:underline,hl+:#0000FF:underline:reverse" \
     --prompt '1. ripgrep> ' \
     --delimiter : \

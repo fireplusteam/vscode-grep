@@ -3,7 +3,7 @@
 #rm -f /tmp/rg-fzf-{r,f}
 
 #RG_PREFIX="rg --column --line-number --no-heading --color=always -i "
-RG_PREFIX="python3 resources/interactive_cmd.py "
+RG_PREFIX="python3 resources/interactive_cmd.py '' "
 INITIAL_QUERY="${*:-}"
 
 # Switch between Ripgrep mode and fzf filtering mode (CTRL-T)
@@ -11,6 +11,11 @@ INITIAL_QUERY="${*:-}"
     --bind "start:reload($RG_PREFIX {q})+transform:python3 resources/transform.py {q} /tmp/rg-fzf-r /tmp/rg-fzf-f" \
     --bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
     --bind "ctrl-t:transform(python3 resources/transform.py {q} /tmp/rg-fzf-r /tmp/rg-fzf-f)" \
+    --bind "ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-j:preview-down,ctrl-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up" \
+    --bind "■:abort" \
+    --bind "esc:abort" \
+    --bind=ctrl-s:toggle-sort \
+    --tiebreak=index \
     --color "hl:#0000FF:underline,hl+:#0000FF:underline:reverse" \
     --prompt '1. ripgrep> ' \
     --delimiter : \
