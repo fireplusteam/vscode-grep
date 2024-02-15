@@ -15,7 +15,7 @@ INITIAL_QUERY="${*:-}"
     --bind "■:abort" \
     --bind "esc:abort" \
     --bind=ctrl-s:toggle-sort \
-    --tiebreak=index \
+    --tiebreak=begin,length \
     --color "hl:#0000FF:underline,hl+:#0000FF:underline:reverse" \
     --prompt '1. ripgrep> ' \
     --delimiter : \

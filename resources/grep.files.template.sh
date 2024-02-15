@@ -17,6 +17,7 @@ RELOAD="$RG_PREFIX \"-fileRELOADING_OPTION ${FILE_RG}\""
     --bind "■:execute-silent(python3 '${PYTHON_DUMP_SCRIPT}' {q} ${FILE_RG} ${FILE_FZF})+abort" \
     --bind "esc:execute-silent(python3 '${PYTHON_DUMP_SCRIPT}' {q} ${FILE_RG} ${FILE_FZF})+abort" \
     --bind=ctrl-s:toggle-sort \
+    --tiebreak=begin,length \
     --color "hl:#0000FF:underline,hl+:#0000FF:underline:reverse" \
     --prompt '1. ripgrep> ' \
     --delimiter ' ~~> ' \
