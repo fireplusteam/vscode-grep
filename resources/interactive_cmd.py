@@ -3,6 +3,7 @@ import sys
 import subprocess
 import os
 import time
+import base64
 
 def print_help(query):
     print(f"Query: {query}")
@@ -14,34 +15,14 @@ def print_help(query):
     """
     print(help)
     
-try:
-    if sys.argv[1].startswith('-fileRELOADING_OPTION'):
-        try:
-            file_name = sys.argv[1].removeprefix("-fileRELOADING_OPTION ").rstrip("\"")
-            with open(file_name, 'r+') as file:
-                query = file.readline().rstrip("\n")
-        except Exception as e:
-            print(f"EXCEPTION while reloading with CTRL+R {str(e)}")
-    else:
-        # query
-        query = sys.argv[1]
     
-    if '--files' in query:
-        awk = "awk -F/ '{ filename=$NF; path=\"\"; for(i=1; i<NF; i++) path=path $i FS; print filename \" ~~> \" path }'"; 
-        query = f"{query} | {awk}"
-        
-    #print(f"QUIERY: {query}")
-    rg = f"rg --column --line-number --no-heading --color=always --ignore-case {query}"
-    if len(query) == 0:
-        print_help(rg)
-        exit(0)
+def run_process(rg: str):
     process = subprocess.Popen(rg, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     # Set output to non-blocking
     flags = fcntl.fcntl(process.stdout, fcntl.F_GETFL) # first get current process.stdout flags
     fcntl.fcntl(process.stdout, fcntl.F_SETFL, flags | os.O_NONBLOCK)
 
     is_ok = False 
-    #print(process.stdout)
     while True:
         try:
             output = process.stdout.buffer.read()
@@ -54,10 +35,41 @@ try:
         if output:
             is_ok = True
             sys.stdout.buffer.write(output)
+    return process,is_ok
+
+
+try:
+    user_input = sys.argv[2]
+    input = base64.b64decode(sys.argv[1].encode('utf-8')).decode('utf-8')
+    
+    if user_input.startswith('-fileRELOADING_OPTION'):
+        try:
+            file_name = user_input.removeprefix("-fileRELOADING_OPTION ").rstrip("\"")
+            with open(file_name, 'r+') as file:
+                query = file.readline().rstrip("\n")
+        except Exception as e:
+            print(f"EXCEPTION while reloading with CTRL+R {str(e)}")
+    else:
+        # query
+        query = user_input
+    
+    if '--files' in input:
+        awk = "awk -F/ '{ filename=$NF; path=\"\"; for(i=1; i<NF; i++) path=path $i FS; print filename \" ~~> \" path }'"; 
+        query = f"{query} | {awk}"
+    
+    base_command = "rg --column --line-number --no-heading --color=always --ignore-case"
+    rg = f"{base_command} {input} {query} "
+    print(f"QUIERY: {input} {query} ")
+           
+    process, is_ok = run_process(rg)
             
     if not is_ok:
-        print("Error: " + process.stderr.read())
-        print_help(rg)
+        rg = f"{base_command} {input} '' {query} "
+        process, is_ok = run_process(rg)
+        
+        if not is_ok:
+            print("Error: " + process.stderr.read())
+            print_help(rg)
         
 except Exception as e:
     print("EXCEPTION_OF_RUNNING: " + str(e))

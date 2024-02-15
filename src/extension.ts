@@ -99,28 +99,25 @@ function getCommandByOption(option: string | undefined) {
   return res;
 }
 
-function getInputByOption(input: string, option: string | undefined) {
+function getInputByOption(option: string | undefined) {
   // awk to print file path in format: filename ~> /path/
   if (option === "Files") {
-    if (input.indexOf("--files") === -1) {
-      input = `--files ${input}`;
-    }
-    return input;
+    return "--files";
   }
   if (option === "Buffers Files") {
     return `-uuu --files -g '{${getAllActiveEditorsPaths().join(",")}}'`;
   }
   if (option === "Content Search") {
-    return input;
+    return "";
   }
   if (option === "Content Search: Active File") {
     // otherwise active file is opened
-    return `-uuu --heading -g \'${getActiveEditorFilePath()}\' ''` || "";
+    return `-uuu --heading -g \'${getActiveEditorFilePath()}\'` || "";
   }
   if (option === "Content Search: Buffers") {
-    return `-uuu -g '{${getAllActiveEditorsPaths().join(",")} ''}' ''`;
+    return `-uuu -g '{${getAllActiveEditorsPaths().join(",")} ''}'`;
   }
-  return input; // by default
+  return ""; // by default
 }
 
 function getFzfOptions(query: string, option: string | undefined) {
@@ -190,17 +187,17 @@ export function activate(context: vscode.ExtensionContext) {
       const script = path.join(scriptPath, `grep${query64}.sh`);
       fs.writeFileSync(script, command, "utf-8");
 
-      let input = "";
+      let userInput = "";
       if (fs.existsSync(fileNameRg)) {
-        input = fs.readFileSync(fileNameRg).toString();
-        while (input.length > 0 && input[input.length - 1] === '\n') {
-          input = input.substring(0, input.length - 1);
+        userInput = fs.readFileSync(fileNameRg).toString();
+        while (userInput.length > 0 && userInput[userInput.length - 1] === '\n') {
+          userInput = userInput.substring(0, userInput.length - 1);
         }
       }
-      input = getInputByOption(input, option);
+      const input = getInputByOption(option);
 
       term?.sendText(`chmod +x ${script}`);
-      term?.sendText(script + " \"" + Buffer.from(input, 'utf-8').toString('base64') + "\"", true);
+      term?.sendText(script + ` "${Buffer.from(userInput, 'utf-8').toString('base64')}" "${Buffer.from(input, 'utf-8').toString('base64')}"`, true);
     })
   );
 

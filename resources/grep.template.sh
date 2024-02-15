@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RG_PREFIX="python3 '${PYTHON_SCRIPT}' "
+RG_PREFIX="python3 '${PYTHON_SCRIPT}' '$2'"
 
 INITIAL_QUERY=$(echo -n "$1" | base64 -d)
 

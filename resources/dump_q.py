@@ -14,6 +14,7 @@ def read_query(file_name):
         return ""
 
 if __name__ == "__main__":
+    current_promt = os.getenv("FZF_PROMPT")
     query = sys.argv[1]
 
     file_rip = sys.argv[2]
