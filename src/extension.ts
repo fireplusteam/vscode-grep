@@ -87,14 +87,14 @@ function getCommandByOption(option: string | undefined) {
   if ( option === "Files" || option === "Buffers Files" ) { 
     res = "grep.files.template.sh";
   }
-  if (option === "Content Search" || option === 'Custom') {
+  if (option === 'Custom') {
     res = 'grep.template.sh';
   }
   if (option === "Content Search: Active File") {
     res = "grep.active.file.template.sh";
   }
-  if (option === "Content Search: Buffers") {
-    res = "grep.buffer.files.content.template.sh";
+  if (option === "Content Search: Buffers" || option === "Content Search") {
+    res = "grep.content.template.sh";
   }
   return res;
 }
