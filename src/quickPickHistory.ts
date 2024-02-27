@@ -1,7 +1,14 @@
 import * as vscode from 'vscode';
 
+function workspace() {
+    const workspace = vscode.workspace.workspaceFolders;
+    if (workspace === undefined)
+        return "";
+    return workspace[0].uri.fsPath;
+}
+
 export async function quickPickHistory(items: string[], context: vscode.ExtensionContext) {
-    const key = `grep.quick.pick.cache${vscode.workspace.getWorkspaceFolder()?.uri || ""}`;
+    const key = `grep.quick.pick.cache${workspace()}`;
     let cache = context.globalState.get<QuickPickHistory[]>(key);
     
     if (cache === undefined || cache.map((e) => { return e.title; }).sort() === items.sort()) {
