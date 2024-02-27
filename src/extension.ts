@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import { quickPickHistory } from './quickPickHistory';
 const TERMINAL_NAME = 'grep';
 let customTerminal: vscode.Terminal | null = null;
 
@@ -130,7 +131,8 @@ function getFzfOptions(query: string, option: string | undefined) {
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('vscode-grep.runGrep', async () => {
-      let option = await vscode.window.showQuickPick(["Files", "Buffers Files", "Content Search", "Content Search: Buffers", "Content Search: Active File", "Custom"]);
+      const { cwd, type } = getCwd();
+      let option = await quickPickHistory(["Files", "Buffers Files", "Content Search", "Content Search: Buffers", "Content Search: Active File", "Custom"], context);
       
       let query = context.globalState.get<string>(`grep.query.${option}`) || "";
       if (option === "Custom") {
@@ -150,7 +152,6 @@ export function activate(context: vscode.ExtensionContext) {
       const fzfOptions = getFzfOptions(query, option);
       query = `${option}:${query}`;
 
-      const { cwd, type } = getCwd();
       let term: vscode.Terminal | null = null;
       if (type === 'file' && vscode.window.activeTextEditor) {
         term = showTerminal({ name: query });
