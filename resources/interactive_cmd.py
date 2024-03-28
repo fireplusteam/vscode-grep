@@ -25,16 +25,20 @@ def run_process(rg: str):
     is_ok = False 
     while True:
         try:
-            output = process.stdout.buffer.read()
-        except OSError:
-            time.sleep(0.05) # wait a short period of time then try again
-            continue
-        
-        if output == b'' and process.poll() is not None:
-            break
-        if output:
-            is_ok = True
-            sys.stdout.buffer.write(output)
+            try:
+                output = process.stdout.buffer.read()
+            except OSError:
+                time.sleep(0.05) # wait a short period of time then try again
+                continue
+            
+            if output == b'' and process.poll() is not None:
+                break
+            if output:
+                is_ok = True
+                sys.stdout.buffer.write(output)
+        except:
+            time.sleep(0.05)
+
     return process,is_ok
 
 
